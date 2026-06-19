@@ -21,7 +21,6 @@ class SchedulerApp:
         self.root.mainloop()
 
     def build_ui(self):
-        """Assembles the overall interface frames."""
         self._setup_top_bar()
 
         container = ctk.CTkFrame(self.root)
@@ -32,7 +31,7 @@ class SchedulerApp:
         self._setup_center_panel(container)
 
     def _setup_top_bar(self):
-        """Top Header section with title and theme settings."""
+
         top = ctk.CTkFrame(self.root, height=80, corner_radius=0)
         top.pack(fill="x")
 
@@ -52,7 +51,7 @@ class SchedulerApp:
         self.theme_btn.pack(side="right", padx=20)
 
     def _setup_left_panel(self, parent):
-        """Left side containing Process Inputs and Execution Mode controls."""
+
         left = ctk.CTkFrame(parent, width=350)
         left.pack(side="left", fill="y", padx=10, pady=10)
 
@@ -127,7 +126,7 @@ class SchedulerApp:
         self.end_btn.pack(fill="x")
 
     def _setup_center_panel(self, parent):
-        """Center frame displaying tracking data, upgraded metrics, and Gantt charts."""
+
         center = ctk.CTkFrame(parent)
         center.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
@@ -180,15 +179,13 @@ class SchedulerApp:
             text_color="#3498DB"
         )
         self.result_title_label.pack(pady=(10, 5))
+
         
-        # ==========================================
-        #  DESIGN UPGRADE: HERO METRIC CARDS GRID
-        # ==========================================
         self.center_metrics_container = ctk.CTkFrame(center, fg_color="transparent")
         self.center_metrics_container.pack(fill="x", padx=40, pady=(5, 15))
         self.center_metrics_container.columnconfigure((0, 1), weight=1, uniform="equal")
 
-        # Upgraded Average Waiting Time Card
+
         self.wt_hero_card = ctk.CTkFrame(self.center_metrics_container, height=90, corner_radius=12, border_width=1, border_color="#3A3A3A")
         self.wt_hero_card.grid(row=0, column=0, padx=15, sticky="nsew")
         self.wt_hero_card.pack_propagate(False)
@@ -202,7 +199,7 @@ class SchedulerApp:
         self.wt_hero_status = ctk.CTkLabel(self.wt_hero_card, text="— No Workload", font=("Arial", 11, "italic"), text_color="#666666")
         self.wt_hero_status.pack(side="right", anchor="e", padx=20, pady=(0, 15))
 
-        # Upgraded Average Turnaround Time Card
+
         self.tat_hero_card = ctk.CTkFrame(self.center_metrics_container, height=90, corner_radius=12, border_width=1, border_color="#3A3A3A")
         self.tat_hero_card.grid(row=0, column=1, padx=15, sticky="nsew")
         self.tat_hero_card.pack_propagate(False)
@@ -215,13 +212,13 @@ class SchedulerApp:
         self.tat_hero_val.pack(side="left", anchor="w", padx=20, pady=(0, 10))
         self.tat_hero_status = ctk.CTkLabel(self.tat_hero_card, text="— No Workload", font=("Arial", 11, "italic"), text_color="#666666")
         self.tat_hero_status.pack(side="right", anchor="e", padx=20, pady=(0, 15))
-        # ==========================================
+
 
         self.chart_frame = ctk.CTkFrame(center)
         self.chart_frame.pack(fill="both", expand=True, padx=20, pady=15)
 
     def _setup_right_panel(self, parent):
-        """Right side panel housing statistical cards."""
+
         right = ctk.CTkFrame(parent, width=340, fg_color="#1a1a1a")
         right.pack(side="right", fill="y", padx=10, pady=10)
         right.pack_propagate(False)
@@ -245,7 +242,7 @@ class SchedulerApp:
         ).pack(side="bottom", pady=20, padx=20, fill="x")
 
     def create_dashboard_cards(self):
-        """Initializes structural card components inside the metrics scroll layout."""
+
         metrics_meta = [
             ("exec_time", "TOTAL EXECUTION", "0ms", "#3498DB"),
             ("proc_count", "TOTAL PROCESSES", "0", "#9B59B6"),
@@ -272,12 +269,12 @@ class SchedulerApp:
             self.metric_cards[key] = {"val_lbl": val, "frame": card, "accent": accent}
 
     def toggle_theme(self):
-        """Toggles interface application dark or light mode configurations."""
+
         current = ctk.get_appearance_mode()
         ctk.set_appearance_mode("light" if current == "Dark" else "dark")
 
     def add_process(self):
-        """Validates input fields and saves valid process configurations to state."""
+
         try:
             p = (
                 self.pid.get(),
@@ -300,7 +297,7 @@ class SchedulerApp:
             messagebox.showerror("Error", "Invalid Input. Ensure metrics are positive numbers and ID is filled.")
 
     def reset_to_main_ui(self):
-        """Wipes simulation context, charts, tables, and resets tracking monitors."""
+ 
         self.processes.clear()
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -309,7 +306,7 @@ class SchedulerApp:
 
         self.result_title_label.configure(text="ACTIVE ALGORITHM: NONE")
         
-        # Reset Upgraded Center Metrics Panel
+
         self.wt_hero_val.configure(text="0.00 ms")
         self.tat_hero_val.configure(text="0.00 ms")
         self.wt_hero_status.configure(text="— No Workload", text_color="#666666")
@@ -327,26 +324,23 @@ class SchedulerApp:
         messagebox.showinfo("Simulation Status", "Simulation data has been fully cleared.")
 
     def smart_advisor(self):
-        """Simulates all algorithms instantly, computes exact results, and displays an elegant recommendation UI."""
+
         if not self.processes:
             messagebox.showwarning("Smart Advisor", "Please add some processes first before consulting the advisor!")
             return
 
         sim_results = {}
         
-        # FCFS Simulation
+        #algo simulation
         fcfs_gantt = self._sim_non_preemptive(sorted(self.processes, key=lambda x: x[1]), criteria_idx=None)
         sim_results["FCFS"] = self._get_sim_metrics(fcfs_gantt)
         
-        # SJF Non-Preemptive Simulation
         sjf_gantt = self._sim_non_preemptive(sorted(self.processes, key=lambda x: x[1]), criteria_idx=2)
         sim_results["SJF (Non-Preemptive)"] = self._get_sim_metrics(sjf_gantt)
 
-        # SRTF (SJF Preemptive) Simulation
         srtf_gantt = self._sim_preemptive(criteria_func=lambda x, rem: rem[x[0]])
         sim_results["SRTF (Preemptive SJF)"] = self._get_sim_metrics(srtf_gantt)
         
-        # Round Robin Simulation
         try: q_val = int(self.quantum.get())
         except ValueError: q_val = 2
         rr_gantt = self._sim_round_robin(q_val)
@@ -557,13 +551,10 @@ class SchedulerApp:
 
         self.result_title_label.configure(text=f"ACTIVE ALGORITHM: {name.upper()}")
         
-        # ==========================================
-        #  DESIGN UPGRADE: DYNAMIC METRICS UPDATER
-        # ==========================================
+        #ui
         self.wt_hero_val.configure(text=f"{avg_wt:.2f} ms")
         self.tat_hero_val.configure(text=f"{avg_tat:.2f} ms")
 
-        # Context-aware efficiency badge assignment
         if avg_wt == 0:
             wt_msg, wt_color = "✨ Zero Latency", "#2ECC71"
         elif avg_wt < 10:
@@ -582,7 +573,6 @@ class SchedulerApp:
 
         self.wt_hero_status.configure(text=wt_msg, text_color=wt_color)
         self.tat_hero_status.configure(text=tat_msg, text_color=tat_color)
-        # ==========================================
         
         self.metric_cards["avg_wt"]["val_lbl"].configure(text=f"{avg_wt:.2f} ms")
         self.metric_cards["avg_tat"]["val_lbl"].configure(text=f"{avg_tat:.2f} ms")
@@ -673,7 +663,6 @@ class SchedulerApp:
         self.metric_cards["sched_status"]["val_lbl"].configure(text="SUCCESS")
 
     def about_us(self):
-        """Displays credits modal for development group members."""
         messagebox.showinfo(
             "ABOUT US",
             "CPU Scheduling Simulator\n\n"
