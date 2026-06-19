@@ -21,6 +21,7 @@ class SchedulerApp:
         self.root.mainloop()
 
     def build_ui(self):
+        """Assembles the overall interface frames."""
         self._setup_top_bar()
 
         container = ctk.CTkFrame(self.root)
@@ -31,7 +32,7 @@ class SchedulerApp:
         self._setup_center_panel(container)
 
     def _setup_top_bar(self):
-
+        """Top Header section with title and theme settings."""
         top = ctk.CTkFrame(self.root, height=80, corner_radius=0)
         top.pack(fill="x")
 
@@ -51,7 +52,7 @@ class SchedulerApp:
         self.theme_btn.pack(side="right", padx=20)
 
     def _setup_left_panel(self, parent):
-
+        
         left = ctk.CTkFrame(parent, width=350)
         left.pack(side="left", fill="y", padx=10, pady=10)
 
@@ -126,7 +127,6 @@ class SchedulerApp:
         self.end_btn.pack(fill="x")
 
     def _setup_center_panel(self, parent):
-
         center = ctk.CTkFrame(parent)
         center.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
@@ -179,12 +179,10 @@ class SchedulerApp:
             text_color="#3498DB"
         )
         self.result_title_label.pack(pady=(10, 5))
-
         
         self.center_metrics_container = ctk.CTkFrame(center, fg_color="transparent")
         self.center_metrics_container.pack(fill="x", padx=40, pady=(5, 15))
         self.center_metrics_container.columnconfigure((0, 1), weight=1, uniform="equal")
-
 
         self.wt_hero_card = ctk.CTkFrame(self.center_metrics_container, height=90, corner_radius=12, border_width=1, border_color="#3A3A3A")
         self.wt_hero_card.grid(row=0, column=0, padx=15, sticky="nsew")
@@ -199,7 +197,6 @@ class SchedulerApp:
         self.wt_hero_status = ctk.CTkLabel(self.wt_hero_card, text="— No Workload", font=("Arial", 11, "italic"), text_color="#666666")
         self.wt_hero_status.pack(side="right", anchor="e", padx=20, pady=(0, 15))
 
-
         self.tat_hero_card = ctk.CTkFrame(self.center_metrics_container, height=90, corner_radius=12, border_width=1, border_color="#3A3A3A")
         self.tat_hero_card.grid(row=0, column=1, padx=15, sticky="nsew")
         self.tat_hero_card.pack_propagate(False)
@@ -213,12 +210,10 @@ class SchedulerApp:
         self.tat_hero_status = ctk.CTkLabel(self.tat_hero_card, text="— No Workload", font=("Arial", 11, "italic"), text_color="#666666")
         self.tat_hero_status.pack(side="right", anchor="e", padx=20, pady=(0, 15))
 
-
         self.chart_frame = ctk.CTkFrame(center)
         self.chart_frame.pack(fill="both", expand=True, padx=20, pady=15)
 
     def _setup_right_panel(self, parent):
-
         right = ctk.CTkFrame(parent, width=340, fg_color="#1a1a1a")
         right.pack(side="right", fill="y", padx=10, pady=10)
         right.pack_propagate(False)
@@ -242,7 +237,7 @@ class SchedulerApp:
         ).pack(side="bottom", pady=20, padx=20, fill="x")
 
     def create_dashboard_cards(self):
-
+        
         metrics_meta = [
             ("exec_time", "TOTAL EXECUTION", "0ms", "#3498DB"),
             ("proc_count", "TOTAL PROCESSES", "0", "#9B59B6"),
@@ -269,12 +264,12 @@ class SchedulerApp:
             self.metric_cards[key] = {"val_lbl": val, "frame": card, "accent": accent}
 
     def toggle_theme(self):
-
+        
         current = ctk.get_appearance_mode()
         ctk.set_appearance_mode("light" if current == "Dark" else "dark")
 
     def add_process(self):
-
+        
         try:
             p = (
                 self.pid.get(),
@@ -297,7 +292,7 @@ class SchedulerApp:
             messagebox.showerror("Error", "Invalid Input. Ensure metrics are positive numbers and ID is filled.")
 
     def reset_to_main_ui(self):
- 
+        
         self.processes.clear()
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -306,7 +301,7 @@ class SchedulerApp:
 
         self.result_title_label.configure(text="ACTIVE ALGORITHM: NONE")
         
-
+        # Reset Upgraded Center Metrics Panel
         self.wt_hero_val.configure(text="0.00 ms")
         self.tat_hero_val.configure(text="0.00 ms")
         self.wt_hero_status.configure(text="— No Workload", text_color="#666666")
@@ -324,14 +319,12 @@ class SchedulerApp:
         messagebox.showinfo("Simulation Status", "Simulation data has been fully cleared.")
 
     def smart_advisor(self):
-
         if not self.processes:
             messagebox.showwarning("Smart Advisor", "Please add some processes first before consulting the advisor!")
             return
 
         sim_results = {}
         
-        #algo simulation
         fcfs_gantt = self._sim_non_preemptive(sorted(self.processes, key=lambda x: x[1]), criteria_idx=None)
         sim_results["FCFS"] = self._get_sim_metrics(fcfs_gantt)
         
@@ -551,9 +544,10 @@ class SchedulerApp:
 
         self.result_title_label.configure(text=f"ACTIVE ALGORITHM: {name.upper()}")
         
-        #ui
+
         self.wt_hero_val.configure(text=f"{avg_wt:.2f} ms")
         self.tat_hero_val.configure(text=f"{avg_tat:.2f} ms")
+
 
         if avg_wt == 0:
             wt_msg, wt_color = "✨ Zero Latency", "#2ECC71"
@@ -573,6 +567,7 @@ class SchedulerApp:
 
         self.wt_hero_status.configure(text=wt_msg, text_color=wt_color)
         self.tat_hero_status.configure(text=tat_msg, text_color=tat_color)
+
         
         self.metric_cards["avg_wt"]["val_lbl"].configure(text=f"{avg_wt:.2f} ms")
         self.metric_cards["avg_tat"]["val_lbl"].configure(text=f"{avg_tat:.2f} ms")
@@ -665,18 +660,12 @@ class SchedulerApp:
     def about_us(self):
         messagebox.showinfo(
             "ABOUT US",
-            "CPU Scheduling Simulator\n\n"
-            "Project Manager - Patrick Erl Abellanosa\n"
-            "Algorithm Engineer (core) - Gaius M. Bongat\n"
-            "Algorithm Engineer (advanced) - JhonPaul Cancejo\n"
-            "Smart Advisor Developer - Shaider Aron Dimayuga\n"
-            "UI/UX Developer - Elijah Lugo\n"
-            "Data Visualization Engineer - Arian Jay Narnola\n"
-            "Quality Assurance Tester - Angela Quirimit\n"
-            "Technical Writer - John michael Bayos\n"
-            "Video Producer & Editor - Charlie Robas\n"
-            "Lead Presenter - Frence Bea Barte / Mary Luxzary Villarosa\n\n"
-            "Email: Group5@gmail.com"
+            "Welcome to our CPU Scheduling System, a project designed to demonstrate how operating systems manage and allocate\n" 
+            "CPU resources efficiently among multiple processes. This system aims to provide users with a clear and interactive\n"
+            "understanding of different CPU scheduling algorithms and their impact on system performance.\n\n"
+            
+            "Our goal is to create an educational and user-friendly platform that helps students, developers, and learners visualize how CPU scheduling works in real-time.\n"
+            "Through simulations and graphical representations, users can explore process execution, waiting time, turnaround time, and CPU utilization.\n\n"
         )
 
 
